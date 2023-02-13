@@ -1,0 +1,7 @@
+db:
+  host: localhost
+  port: 5432
+  username: postgres
+  dbName:  beletme
+  password: password0701
+  sslMode: disable
