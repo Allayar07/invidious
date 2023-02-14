@@ -4,16 +4,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"invidious/internal/service"
+	"invidious/internal/repository"
 )
 
 type Handler struct {
-	service *service.Service
+	repos *repository.VideoRepository
 }
 
-func NewHandler(service *service.Service) *Handler {
+func NewHandler(repos *repository.VideoRepository) *Handler {
 	return &Handler{
-		service: service,
+		repos: repos,
 	}
 }
 
@@ -25,7 +25,11 @@ func (h *Handler) InitRoutes() *fiber.App {
 		cors.New(),
 	)
 
-	routes.Get("/api", h.helloWorld)
+	routes.Post("/channel", h.InsertChannels)
+	routes.Post("/playlist", h.InsertPlaylists)
+	routes.Post("/metas", h.InsertVideoMetas)
+	routes.Post("/video", h.InsertVideos)
+	routes.Post("/genres", h.InsertGenres)
 
 	return routes
 }

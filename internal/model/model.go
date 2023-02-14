@@ -2,20 +2,18 @@ package model
 
 import "github.com/spf13/viper"
 
-type (
-	AppConfig struct {
-		DB DB
-	}
+type AppConfig struct {
+	DB DB
+}
 
-	DB struct {
-		Host     string
-		Port     string
-		UserName string
-		DbName   string
-		Password string
-		SslMode  string
-	}
-)
+type DB struct {
+	Host     string
+	Port     string
+	UserName string
+	DbName   string
+	Password string
+	SslMode  string
+}
 
 func NewAppConfig(fileName string) (*AppConfig, error) {
 	config, err := LoadConfigFile(fileName)
@@ -33,6 +31,7 @@ func LoadConfigFile(fileName string) (*AppConfig, error) {
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}
+
 	var appConfig AppConfig
 	if err := viper.Unmarshal(&appConfig); err != nil {
 		return nil, err

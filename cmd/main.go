@@ -4,7 +4,6 @@ import (
 	"invidious/internal/handler"
 	"invidious/internal/model"
 	"invidious/internal/repository"
-	"invidious/internal/service"
 	"log"
 )
 
@@ -15,7 +14,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	_, err = repository.NewPostgres(repository.Config{
+	db, err := repository.NewPostgres(repository.Config{
 		Host:     config.DB.Host,
 		Port:     config.DB.Port,
 		Username: config.DB.UserName,
@@ -27,8 +26,9 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	newService := service.NewService()
-	newHandler := handler.NewHandler(newService)
+	newRepository := repository.NewVideoRepository(db)
+	//newService := service.NewService()
+	newHandler := handler.NewHandler(newRepository)
 
 	app := newHandler.InitRoutes()
 

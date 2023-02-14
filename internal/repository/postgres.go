@@ -1,15 +1,11 @@
 package repository
 
 import (
+	"context"
 	"fmt"
-
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4/pgxpool"
 
 	_ "github.com/lib/pq"
-)
-
-const (
-	AdsTable = "ads"
 )
 
 type Config struct {
@@ -21,14 +17,22 @@ type Config struct {
 	SSLMode  string
 }
 
-func NewPostgres(cfg Config) (*sqlx.DB, error) {
-	str := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.Username, cfg.DbName, cfg.Password, cfg.SSLMode)
+func NewPostgres(cfg Config) (*pgxpool.Pool, error) {
+	//str := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+	//	cfg.Host, cfg.Port, cfg.Username, cfg.DbName, cfg.Password, cfg.SSLMode)
+	//
+	//db, err := sqlx.Open("postgres", str)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//return db, nil
 
-	db, err := sqlx.Open("postgres", str)
+	pool, err := pgxpool.Connect(context.Background(), fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+		cfg.Host, cfg.Port, cfg.Username, cfg.DbName, cfg.Password, cfg.SSLMode))
 	if err != nil {
 		return nil, err
 	}
 
-	return db, nil
+	return pool, nil
 }
