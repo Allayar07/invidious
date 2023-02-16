@@ -4,17 +4,23 @@ import (
 	"time"
 )
 
+type MediaInfo struct {
+	Url    string `json:"url"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
+}
+
 type (
 	Channels struct {
 		Id                     int         `json:"id"`
-		ChannelTitle           string      `json:"channelTitle"`
+		ChannelTitle           string      `json:"author"`
 		ChannelSlug            string      `json:"channelSlug"`
-		ChannelDescription     string      `json:"channelDescription"`
+		ChannelDescription     string      `json:"description"`
 		ChannelKeywords        []string    `json:"channelKeywords"`
 		ChannelOwner           string      `json:"channelOwner"`
-		ChannelYoutubeId       string      `json:"channelYoutubeId"`
-		ChannelBanners         interface{} `json:"channel_banners"`
-		ChannelThumbnails      interface{} `json:"channel_thumbnails"`
+		ChannelYoutubeId       string      `json:"authorId"`
+		ChannelBanners         []MediaInfo `json:"authorBanners"`
+		ChannelThumbnails      []MediaInfo `json:"authorThumbnails"`
 		ChannelException       string      `json:"channelException"`
 		ChannelStatus          int         `json:"channelStatus"`
 		ChannelIsForeign       bool        `json:"channelIsForeign"`
@@ -79,3 +85,7 @@ type (
 		GenreTitleRu string `json:"genreTitleRu"`
 	}
 )
+
+type ChannelId struct {
+	ChannelUniqId string `json:"id"`
+}

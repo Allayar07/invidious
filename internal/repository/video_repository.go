@@ -25,7 +25,7 @@ func NewVideoRepository(db *pgxpool.Pool) *VideoRepository {
 	}
 }
 
-func (r *VideoRepository) InsertIntoChannelsTable(ctx context.Context, channels *model.Channels) error {
+func (r *VideoRepository) InsertIntoChannelsTable(ctx context.Context, channels model.Channels) error {
 	query := fmt.Sprintf(`INSERT INTO %s (channel_title, channel_slug, channel_description, channel_keywords,
                 channel_owner, channel_youtube_id, channel_banners, channel_thumbnails, channel_exception, channel_status, 
                 channel_is_foreign, channel_subscriber_count, created_at, updated_at, deleted_at, channel_access_type) 
@@ -39,7 +39,7 @@ func (r *VideoRepository) InsertIntoChannelsTable(ctx context.Context, channels 
 	return err
 }
 
-func (r *VideoRepository) InsertIntoPlaylistsTable(ctx context.Context, playlist *model.Playlists) error {
+func (r *VideoRepository) InsertIntoPlaylistsTable(ctx context.Context, playlist model.Playlists) error {
 	query := fmt.Sprintf(`INSERT INTO %s (channel_id, playlist_title, playlist_description, playlist_keywords,
                 				playlist_youtube_id, playlist_video_count, created_at, updated_at, deleted_at) 
 								VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, PlaylistsTable)
@@ -50,7 +50,7 @@ func (r *VideoRepository) InsertIntoPlaylistsTable(ctx context.Context, playlist
 	return err
 }
 
-func (r *VideoRepository) InsertIntoVideoMetasTable(ctx context.Context, videoMeta *model.VideoMetas) error {
+func (r *VideoRepository) InsertIntoVideoMetasTable(ctx context.Context, videoMeta model.VideoMetas) error {
 	query := fmt.Sprintf("INSERT INTO %s (video_id, video_duration, video_thumbnails, created_at, updated_at, deleted_at, image_full_download_status) VALUES ($1, $2, $3, $4, $5, $6, $7)", VideoMetasTable)
 
 	_, err := r.db.Exec(ctx, query, videoMeta.VideoId, videoMeta.VideoDuration, videoMeta.VideoThumbnails, videoMeta.CreatedAt, videoMeta.UpdatedAt, videoMeta.DeletedAt, videoMeta.ImageFullDownloadStatus)
@@ -58,7 +58,7 @@ func (r *VideoRepository) InsertIntoVideoMetasTable(ctx context.Context, videoMe
 	return err
 }
 
-func (r *VideoRepository) InsertIntoVideosTable(ctx context.Context, video *model.Videos) error {
+func (r *VideoRepository) InsertIntoVideosTable(ctx context.Context, video model.Videos) error {
 	query := fmt.Sprintf(`INSERT INTO %s (channel_id, playlist_id, video_title, video_description, video_keywords,
                 video_youtube_id, video_download_status, video_transcode_status, video_likes, video_dislikes, video_views, 
                 youtube_likes, youtube_dislikes, youtube_views, created_at, updated_at, deleted_at, video_transcode_path, video_access_type, genre_id)
@@ -72,7 +72,7 @@ func (r *VideoRepository) InsertIntoVideosTable(ctx context.Context, video *mode
 	return err
 }
 
-func (r *VideoRepository) InsertIntoGenresTable(ctx context.Context, genres *model.Genres) error {
+func (r *VideoRepository) InsertIntoGenresTable(ctx context.Context, genres model.Genres) error {
 	query := fmt.Sprintf(`INSERT INTO %s (genre_title, genre_title_ru) VALUES ($1, $2)`, GenresTable)
 
 	_, err := r.db.Exec(ctx, query, genres.GenreTitle, genres.GenreTitleRu)
