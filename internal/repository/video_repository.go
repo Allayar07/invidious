@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"invidious/internal/model"
+
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 const (
@@ -25,18 +26,22 @@ func NewVideoRepository(db *pgxpool.Pool) *VideoRepository {
 	}
 }
 
-func (r *VideoRepository) InsertIntoChannelsTable(ctx context.Context, channels model.Channels) error {
+func (r *VideoRepository) InsertIntoChannelsTable(ctx context.Context, channels model.Channels) (int, error) {
+	var id int
 	query := fmt.Sprintf(`INSERT INTO %s (channel_title, channel_slug, channel_description, channel_keywords,
                 channel_owner, channel_youtube_id, channel_banners, channel_thumbnails, channel_exception, channel_status, 
                 channel_is_foreign, channel_subscriber_count, created_at, updated_at, deleted_at, channel_access_type) 
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`, ChannelsTable)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`, ChannelsTable)
 
-	_, err := r.db.Exec(ctx, query, channels.ChannelTitle, channels.ChannelSlug, channels.ChannelDescription, channels.ChannelKeywords,
+	row := r.db.QueryRow(ctx, query, channels.ChannelTitle, channels.ChannelSlug, channels.ChannelDescription, channels.ChannelKeywords,
 		channels.ChannelOwner, channels.ChannelYoutubeId, channels.ChannelBanners, channels.ChannelThumbnails, channels.ChannelException,
 		channels.ChannelStatus, channels.ChannelIsForeign, channels.ChannelSubscriberCount, channels.CreatedAt, channels.UpdatedAt, channels.DeletedAt,
 		channels.ChannelAccessType)
+	if err := row.Scan(&id); err != nil {
+		return 0, err
+	}
 
-	return err
+	return id, nil
 }
 
 func (r *VideoRepository) InsertIntoPlaylistsTable(ctx context.Context, playlist model.Playlists) error {

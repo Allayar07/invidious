@@ -34,10 +34,10 @@ type (
 	Playlists struct {
 		Id                  int       `json:"id"`
 		ChannelId           int       `json:"channelId"`
-		PlaylistTitle       string    `json:"playlistTitle"`
+		PlaylistTitle       string    `json:"title"`
 		PlaylistDescription string    `json:"playlistDescription"`
 		PlaylistKeywords    []string  `json:"playlistKeywords"`
-		PlaylistYoutubeId   string    `json:"playlistYoutubeId"`
+		PlaylistYoutubeId   string    `json:"playlistId"`
 		PlaylistVideoCount  int       `json:"playlistVideoCount"`
 		CreatedAt           time.Time `json:"createdAt"`
 		UpdatedAt           time.Time `json:"updatedAt"`
@@ -59,24 +59,25 @@ type (
 		Id                   int       `json:"id"`
 		ChannelId            int       `json:"channelId"`
 		PlaylistId           int       `json:"playlistId"`
-		VideoTitle           string    `json:"videoTitle"`
-		VideoDescription     string    `json:"videoDescription"`
+		VideoTitle           string    `json:"title"`
+		VideoDescription     string    `json:"description"`
 		VideoKeywords        []string  `json:"videoKeywords"`
-		VideoYoutubeId       string    `json:"videoYoutubeId"`
+		VideoYoutubeId       string    `json:"videoId"`
 		VideoDownloadStatus  int       `json:"videoDownloadStatus"`
 		VideoTranscodeStatus int       `json:"videoTranscodeStatus"`
 		VideoLikes           int       `json:"videoLikes"`
 		VideoDislikes        int       `json:"videoDislikes"`
 		VideoViews           int       `json:"videoViews"`
-		YoutubeLikes         int       `json:"youtubeLikes"`
-		YoutubeDislikes      int       `json:"youtubeDislikes"`
-		YoutubeViews         int       `json:"youtubeViews"`
+		YoutubeLikes         int       `json:"likeCount"`
+		YoutubeDislikes      int       `json:"dislikeCount"`
+		YoutubeViews         int       `json:"viewCount"`
 		CreatedAt            time.Time `json:"createdAt"`
 		UpdatedAt            time.Time `json:"updatedAt"`
 		DeletedAt            time.Time `json:"deletedAt"`
 		VideoTranscodePath   string    `json:"videoTranscodePath"`
 		VideoAccessType      int       `json:"videoAccessType"`
 		GenreId              int       `json:"genreId"`
+		Genre                string    `json:"genre"`
 	}
 
 	Genres struct {
@@ -86,6 +87,14 @@ type (
 	}
 )
 
-type ChannelId struct {
-	ChannelUniqId string `json:"id"`
+type UniqId struct {
+	UniqId string `json:"id"`
+}
+
+type Video struct {
+	Elements []Videos `json:"videos"`
+}
+
+type PlaylistOfChannel struct {
+	Playlists []Playlists `json:"playlists"`
 }

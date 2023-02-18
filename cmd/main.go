@@ -4,6 +4,7 @@ import (
 	"invidious/internal/handler"
 	"invidious/internal/model"
 	"invidious/internal/repository"
+	"invidious/internal/service"
 	"log"
 )
 
@@ -27,8 +28,8 @@ func main() {
 	}
 
 	newRepository := repository.NewVideoRepository(db)
-	//newService := service.NewService()
-	newHandler := handler.NewHandler(newRepository)
+	newService := service.NewService(newRepository)
+	newHandler := handler.NewHandler(newService)
 
 	app := newHandler.InitRoutes()
 
