@@ -20,17 +20,12 @@ func (h *Handler) InsertChannels(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(channelId)
-}
-
-func (h *Handler) InsertVideos(c *fiber.Ctx) error {
-	var input model.UniqId
-
-	if err := c.BodyParser(&input); err != nil {
+	playlistId, err := h.service.DB.InsertIntoPlaylistsTable(context.Background(), input, channelId)
+	if err != nil {
 		return err
 	}
 
-	video, err := h.service.DB.InsertIntoVideosTable(context.Background(), input)
+	video, err := h.service.DB.InsertIntoVideosTable(context.Background(), input, channelId, playlistId)
 	if err != nil {
 		return err
 	}
@@ -38,20 +33,35 @@ func (h *Handler) InsertVideos(c *fiber.Ctx) error {
 	return c.JSON(video)
 }
 
-func (h *Handler) InsertToPlaylist(c *fiber.Ctx) error {
-	var input model.UniqId
+// func (h *Handler) InsertVideos(c *fiber.Ctx) error {
+// 	var input model.UniqId
 
-	if err := c.BodyParser(&input); err != nil {
-		return err
-	}
+// 	if err := c.BodyParser(&input); err != nil {
+// 		return err
+// 	}
 
-	playlists, err := h.service.DB.InsertIntoPlaylistsTable(context.Background(), input)
-	if err != nil {
-		return err
-	}
+// 	video, err := h.service.DB.InsertIntoVideosTable(context.Background(), input)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return c.JSON(playlists)
-}
+// 	return c.JSON(video)
+// }
+
+// func (h *Handler) InsertToPlaylist(c *fiber.Ctx) error {
+// 	var input model.UniqId
+
+// 	if err := c.BodyParser(&input); err != nil {
+// 		return err
+// 	}
+
+// 	playlists, err := h.service.DB.InsertIntoPlaylistsTable(context.Background(), input)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return c.JSON(playlists)
+// }
 
 func (h *Handler) InsertGenres(c *fiber.Ctx) error {
 	var input model.Genres

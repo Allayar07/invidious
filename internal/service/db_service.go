@@ -52,15 +52,18 @@ func (s *DbService) InsertIntoChannelsTable(ctx context.Context, id model.UniqId
 	channels.ChannelThumbnails = thumbnailUrls
 
 	chanId, err := s.repos.InsertIntoChannelsTable(ctx, channels)
+	if err != nil {
+		return 0, err
+	}
 
-	return chanId, err
+	return chanId, nil
 }
 
 func (s *DbService) InsertIntoGenresTable(ctx context.Context, genre model.Genres) error {
 	return s.repos.InsertIntoGenresTable(ctx, genre)
 }
 
-func (s *DbService) InsertIntoPlaylistsTable(ctx context.Context, id model.UniqId) ([]model.Playlists, error) {
+func (s *DbService) InsertIntoPlaylistsTable(ctx context.Context, id model.UniqId, chanId int) (int, error) {
 
 	playlist := model.PlaylistOfChannel{}
 
@@ -68,29 +71,26 @@ func (s *DbService) InsertIntoPlaylistsTable(ctx context.Context, id model.UniqI
 
 	_, respBody, err := fasthttp.Get(nil, urlOfChannelsPlaylists)
 	if err != nil {
-		return []model.Playlists{}, err
+		return 0, err
 	}
 
 	if err = json.Unmarshal(respBody, &playlist); err != nil {
-		return []model.Playlists{}, err
+		return 0, err
 	}
 
-	playlistarray := make([]model.Playlists, 0)
 	for _, obj := range playlist.Playlists {
 		obj.PlaylistKeywords = []string{}
-		obj.ChannelId = 1
+		obj.ChannelId = chanId
 
-		if err := s.repos.InsertIntoPlaylistsTable(ctx, obj); err != nil {
-			return []model.Playlists{}, err
-		}
+		plListId, err := s.repos.InsertIntoPlaylistsTable(ctx, obj)
 
-		playlistarray = append(playlistarray, obj)
+		return plListId, err
 	}
 
-	return playlistarray, nil
+	return 0, nil
 }
 
-func (s *DbService) InsertIntoVideosTable(ctx context.Context, id model.UniqId) ([]model.Videos, error) {
+func (s *DbService) InsertIntoVideosTable(ctx context.Context, id model.UniqId, chanId, playlistId int) ([]model.Videos, error) {
 	var (
 		videosArray model.Video
 		video       model.Videos
@@ -102,7 +102,7 @@ func (s *DbService) InsertIntoVideosTable(ctx context.Context, id model.UniqId) 
 		return []model.Videos{}, err
 	}
 
-	if err = json.Unmarshal(respBody, &videosArray); err != nil {
+	if err := json.Unmarshal(respBody, &videosArray); err != nil {
 		return []model.Videos{}, err
 	}
 
@@ -113,7 +113,7 @@ func (s *DbService) InsertIntoVideosTable(ctx context.Context, id model.UniqId) 
 
 		wg.Add(1)
 
-		go func(obj model.Videos) error {
+		go func(obj, video model.Videos) error {
 			urlOfVideoGenre := fmt.Sprintf("https://vid.puffyan.us/api/v1/videos/%s", obj.VideoYoutubeId)
 
 			_, videorespBody, err := fasthttp.Get(nil, urlOfVideoGenre)
@@ -121,7 +121,7 @@ func (s *DbService) InsertIntoVideosTable(ctx context.Context, id model.UniqId) 
 				return err
 			}
 
-			if err = json.Unmarshal(videorespBody, &video); err != nil {
+			if err := json.Unmarshal(videorespBody, &video); err != nil {
 				return err
 			}
 
@@ -159,8 +159,8 @@ func (s *DbService) InsertIntoVideosTable(ctx context.Context, id model.UniqId) 
 			}
 
 			video.VideoKeywords = []string{}
-			video.PlaylistId = 1
-			video.ChannelId = 1
+			video.PlaylistId = playlistId
+			video.ChannelId = chanId
 			video.CreatedAt = time.Now()
 			video.UpdatedAt = time.Now()
 
@@ -171,7 +171,7 @@ func (s *DbService) InsertIntoVideosTable(ctx context.Context, id model.UniqId) 
 			wg.Done()
 
 			return err
-		}(obj)
+		}(obj, video)
 
 	}
 

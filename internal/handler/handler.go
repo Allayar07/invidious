@@ -27,9 +27,9 @@ func (h *Handler) InitRoutes() *fiber.App {
 	)
 
 	routes.Post("/channel", h.InsertChannels)
-	routes.Post("/playlist", h.InsertToPlaylist)
+	// routes.Post("/playlist", h.InsertToPlaylist)
 	// routes.Post("/metas", h.InsertVideoMetas)
-	routes.Post("/video", h.InsertVideos)
+	// routes.Post("/video", h.InsertVideos)
 	routes.Post("/genres", h.InsertGenres)
 
 	return routes

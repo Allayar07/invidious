@@ -44,15 +44,20 @@ func (r *VideoRepository) InsertIntoChannelsTable(ctx context.Context, channels 
 	return id, nil
 }
 
-func (r *VideoRepository) InsertIntoPlaylistsTable(ctx context.Context, playlist model.Playlists) error {
+func (r *VideoRepository) InsertIntoPlaylistsTable(ctx context.Context, playlist model.Playlists) (int, error) {
+	var id int
 	query := fmt.Sprintf(`INSERT INTO %s (channel_id, playlist_title, playlist_description, playlist_keywords,
                 				playlist_youtube_id, playlist_video_count, created_at, updated_at, deleted_at) 
-								VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, PlaylistsTable)
+								VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, PlaylistsTable)
 
-	_, err := r.db.Exec(ctx, query, playlist.ChannelId, playlist.PlaylistTitle, playlist.PlaylistDescription, playlist.PlaylistKeywords,
+	row := r.db.QueryRow(ctx, query, playlist.ChannelId, playlist.PlaylistTitle, playlist.PlaylistDescription, playlist.PlaylistKeywords,
 		playlist.PlaylistYoutubeId, playlist.PlaylistVideoCount, playlist.CreatedAt, playlist.UpdatedAt, playlist.DeletedAt)
 
-	return err
+	if err := row.Scan(&id); err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (r *VideoRepository) InsertIntoVideoMetasTable(ctx context.Context, videoMeta model.VideoMetas) error {
